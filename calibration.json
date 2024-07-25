@@ -1,0 +1,67 @@
+{
+  "servo_mapping": {
+    "left_eye_horizontal": {
+      "channel": 0,
+      "center_angle": 100,
+      "angle_span": 105
+    },
+    "left_eye_vertical": {
+      "channel": 1,
+      "center_angle": 111,
+      "angle_span": 105
+    },
+    "right_eye_horizontal": {
+      "channel": 2,
+      "center_angle": 80,
+      "angle_span": 105
+    },
+    "right_eye_vertical": {
+      "channel": 3,
+      "center_angle": 90,
+      "angle_span": 105
+    },
+    "left_eyelid": {
+      "channel": 4,
+      "min_angle": 70,
+      "max_angle": 135
+    },
+    "right_eyelid": {
+      "channel": 5,
+      "min_angle": 75,
+      "max_angle": 135
+    },
+    "jaw": {
+      "channel": 6,
+      "min_angle": 80,
+      "max_angle": 55
+    },
+    "neck_horizontal": {
+      "channel": 7,
+      "center_angle": 108.78952737164231,
+      "angle_span": 60
+    },
+    "neck_vertical": {
+      "channel": 8,
+      "center_angle": 114.6650799047943,
+      "min_angle": 60,
+      "angle_span": 65
+    },
+    "tail": {
+      "channel": 9,
+      "center_angle": 90,
+      "angle_span": 135
+    }
+  },
+  "audio_input_settings": {
+    "channels": 1,
+    "rate": 44100,
+    "chunk": 512,
+    "mic_name": "H17H_USB_AUDIO",
+    "mic_threshold_low": -38,
+    "mic_threshold_hi": -21
+  },
+  "smoothing_settings": {
+    "smoothing_ratio_eye": 0.8,
+    "smoothing_ratio_neck": 0.95
+  }
+}
