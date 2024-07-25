@@ -42,5 +42,5 @@ Thumbs.db
 bin/
 include/
 lib/
-lib64/
 share/
+lib64
