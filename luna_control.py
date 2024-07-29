@@ -136,6 +136,13 @@ class LunaController(Controller):
         self.tail_half_amplitude = self.servo_info["tail"]["angle_span"] / 2  # degrees
         self.tail_period_seconds = 5.0
         
+        # Luna's Story Lip Sync Playback
+        self.lip_sync_active = False
+        self.lip_sync_zero_timestamp: float = time.monotonic()
+        self.lip_sync_index = 0
+        with open("lunas_story_jaw_values.json") as jaw_values_f:
+            self.lip_sync_jaw_values = json.load(jaw_values_f)
+        
         # Controller Input State
         self.right_stick_x = 0
         self.right_stick_y = 0
@@ -228,6 +235,19 @@ class LunaController(Controller):
             self.is_blinking = False
         return blink_values[i][1]
         
+    def start_lip_sync(self):
+        self.lip_sync_index = 0
+        self.lip_sync_active = True
+        self.lip_sync_zero_timestamp = time.monotonic()
+        print("Lip Sync Started")
+        
+    def stop_lip_sync(self):
+        self.lip_sync_active = False
+        # Reset the idle breathing routine
+        self.idle_breath_countdown_zero = time.monotonic()
+        self.on_L2_release()
+        print("Lip Sync Stopped / Ended")
+        
     def audio_stream_callback(self, input_data, frame_count, time_info, flags):
         if flags != 0:
             return None, pyaudio.paContinue
@@ -253,7 +273,7 @@ class LunaController(Controller):
             self.servo_info["jaw"]["max_angle"],
             clamp=True
         )
-        if self.jaw_controller_priority == False and self.get_idle_mode() & 0b10 == 0:
+        if self.jaw_controller_priority == False and self.get_idle_mode() & 0b10 == 0 and not self.lip_sync_active:
             self.servos["jaw"].angle = jaw_value
 
         return None, pyaudio.paContinue
@@ -298,6 +318,18 @@ class LunaController(Controller):
     
     def on_L3_down(self, value):
         self.left_stick_y = self.deadzone(value)
+    
+    def on_R3_x_at_rest(self):
+        pass
+    
+    def on_R3_y_at_rest(self):
+        pass
+
+    def on_L3_x_at_rest(self):
+        pass
+
+    def on_L3_y_at_rest(self):
+        pass
         
     def calibrate_eyes(self):
         # Left Eye (Right Stick)
@@ -451,6 +483,12 @@ class LunaController(Controller):
             elif self.calibration_mode == 3:
                 self.calibrate_neck()
                 continue
+                
+            # Handle Lip Sync start/stop
+            if self.triangle_is_pressed and not self.lip_sync_active:
+                self.start_lip_sync()
+            if self.lip_sync_active and self.square_is_pressed:
+                self.stop_lip_sync()
 
             #### EYES ####
             _eye_x = (self.right_stick_x_prev *  self.smoothing_settings["smoothing_ratio_eye"]) + (self.right_stick_x * (1 - self.smoothing_settings["smoothing_ratio_eye"]))
@@ -510,8 +548,9 @@ class LunaController(Controller):
                 _neck_x = 0
                 
                 # Also move the JAW with autonomous breathing
-                jaw_input_value = self.breath_jaw_center_value - self.breath_jaw_half_amplitude * np.sin(t * 2 * np.pi / self.breath_period_seconds)
-                self.handle_jaw_input(jaw_input_value)
+                if not self.lip_sync_active:
+                    jaw_input_value = self.breath_jaw_center_value - self.breath_jaw_half_amplitude * np.sin(t * 2 * np.pi / self.breath_period_seconds)
+                    self.handle_jaw_input(jaw_input_value)
             else:
                 # Apply smoothing to the neck, if not in idle mode
                 _neck_x = (self.left_stick_x_prev * self.smoothing_settings["smoothing_ratio_neck"]) + (self.left_stick_x * (1 - self.smoothing_settings["smoothing_ratio_neck"]))
@@ -539,6 +578,19 @@ class LunaController(Controller):
             # print(f"Neck -- h: {self.servos['neck_horizontal'].angle}\tv: {self.servos['neck_vertical'].angle}\r")
             
             # print("Idle mode: ", "{0:b}".format(self.get_idle_mode()))
+            
+            #### JAW (Lip Sync) ####
+            # Idle animation handled above (under NECK); mic input sync handled under audio_stream_callback; controller input handled under on_L2_press
+            if self.lip_sync_active:
+                ts = time.monotonic() - self.lip_sync_zero_timestamp
+                if self.lip_sync_index + 1 >= len(self.lip_sync_jaw_values) - 1:
+                    self.stop_lip_sync()
+                    self.lip_sync_index = len(self.lip_sync_jaw_values) - 1
+                else:
+                    while self.lip_sync_jaw_values[self.lip_sync_index + 1][0] < ts:
+                        self.lip_sync_index += 1
+                self.handle_jaw_input(self.lip_sync_jaw_values[self.lip_sync_index][1])
+                # print(f"ts: {ts}\tcur: {self.lip_sync_jaw_values[self.lip_sync_index][0]}\traw:{self.lip_sync_jaw_values[self.lip_sync_index][1]}\tangle: {self.servos['jaw'].angle}")
             
             #### TAIL ####
             t = time.monotonic()
@@ -646,6 +698,9 @@ class LunaController(Controller):
         self.servos["left_eyelid"].angle = self.servo_info["left_eyelid"]["min_angle"]
 
     def on_L2_press(self, value):
+        if self.lip_sync_active:
+            # Lip Sync takes priority over everything, abort here
+            return
         self.jaw_controller_priority = True
         
         # Reset the countdown timer to re-initiate idle breathe mode
@@ -667,6 +722,9 @@ class LunaController(Controller):
             
     def on_L2_release(self):
         """Release Jaw to Neutral"""
+        if self.lip_sync_active:
+            # Lip Sync takes priority over everything, abort here
+            return
         self.servos["jaw"].angle = self.servo_info["jaw"]["min_angle"]
         self.jaw_controller_priority = False
         
