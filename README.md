@@ -9,6 +9,8 @@
 2. In a terminal, run these commands (replacing PATH/TO with the actual directory path):
     ```
     cd ~/PATH/TO/Lunas-Code
+    sudo apt-get install libasound-dev
+    sudo apt-get install portaudio19-dev
     python -m venv .
     source bin/activate
     pip install -r requirements.txt
