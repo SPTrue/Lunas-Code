@@ -140,8 +140,14 @@ class LunaController(Controller):
         self.lip_sync_active = False
         self.lip_sync_zero_timestamp: float = time.monotonic()
         self.lip_sync_index = 0
-        with open("lunas_story_jaw_values.json") as jaw_values_f:
-            self.lip_sync_jaw_values = json.load(jaw_values_f)
+        jaw_values_file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "lunas_story_jaw_values.json")
+        try:
+            with open(jaw_values_file_path) as jaw_values_f:
+                self.lip_sync_jaw_values = json.load(jaw_values_f)
+        except FileNotFoundError as err:
+            print("Lip Sync Data not Found!")
+            print(err)
+            self.lip_sync_jaw_values = [[0, -32767], [1, -32767]]
         
         # Controller Input State
         self.right_stick_x = 0
