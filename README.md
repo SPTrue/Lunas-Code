@@ -1,6 +1,5 @@
 # Luna the Animatronic Alebrije
-## Introduction (TODO)
-TODO: add a picture of Luna in action
+Animatronic Ambassador for the Living Text Project at Monterey County Office of Education
 
 ## Hardware and Requirements
 - Raspberry Pi 4, running Raspbian OS
@@ -10,7 +9,13 @@ TODO: add a picture of Luna in action
 - [Wireless USB Microphone](https://www.amazon.com/Lococo-Wireless-Microphone-Rechargeable-Amplifier/dp/B0C2VBH26P) (Optional)
 - Servos, CAD files, and misc. hardware for the actual animatronic are currently out-of-scope of this repository.
 
-TODO: add picture / diagram of wiring connections between Raspberry Pi and Servo Driver Board
+#### Wiring the Raspberry Pi to connect to the Servo Driver Board
+| Raspberry Pi GPIO | PCA9685 |
+| ----------------- | ------- |
+| 3.3v | VCC |
+| GPIO 2 | SDA |
+| GPIO 3 | SCL |
+| Ground | GND |
 
 ## Software setup
 ### First time setup
