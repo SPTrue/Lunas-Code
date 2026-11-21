@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Luna Control</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <header>
+    <div class="brand"><span class="mark" aria-hidden="true">L</span><div><h1>Luna</h1><span class="eyebrow">LIVING TEXT · CONTROL</span></div></div>
+    <div class="connection"><span id="dot"></span><span id="connection">Not connected</span></div>
+    <button id="connect" class="secondary">Connect</button>
+    <button id="settings" class="icon" aria-label="Open settings">☰</button>
+  </header>
+  <div id="preview-note" hidden>LAYOUT PREVIEW · Bluetooth works only in the installed Android app. No robot is connected.</div>
+  <div id="error" role="status" aria-live="polite"></div>
+  <main>
+    <section id="panel">
+      <div class="panel-top"><span id="mode" class="pill">OFFLINE</span><p id="hint">Connect to Luna to begin.</p><button id="take" disabled>Take control</button><button id="release" class="secondary" disabled>Return to idle</button></div>
+      <fieldset id="motion" disabled>
+        <legend class="sr-only">Live movement controls</legend>
+        <div class="controls">
+          <div class="stick-group"><div class="label-row"><h2>Head &amp; neck</h2><span>SPRING RETURN</span></div>
+            <div class="stick" id="head-stick" role="application" aria-label="Head joystick. Use arrow keys or drag." tabindex="0"><i class="axis x"></i><i class="axis y"></i><div class="stick-ring"></div><div class="knob"><span>✦</span></div></div>
+            <p class="control-note">Drag to move · release to center</p>
+          </div>
+          <div class="center-controls">
+            <label class="range-label" for="jaw">Jaw <span>HOLD TO OPEN</span></label>
+            <input id="jaw" type="range" min="0" max="100" value="0" aria-label="Jaw opening; release to close">
+            <label class="range-label" for="lids">Eyelids <span>HOLD TO CLOSE</span></label>
+            <input id="lids" type="range" min="0" max="100" value="0" aria-label="Eyelid closing; release to open">
+            <button id="wide" class="secondary">Hold · eyes wide</button>
+            <span class="small">Manual jaw overrides the microphone.</span>
+          </div>
+          <div class="stick-group"><div class="label-row"><h2>Eyes</h2><span>SPRING RETURN</span></div>
+            <div class="stick" id="eyes-stick" role="application" aria-label="Eye joystick. Use arrow keys or drag." tabindex="0"><i class="axis x"></i><i class="axis y"></i><div class="stick-ring"></div><div class="knob"><span>✦</span></div></div>
+            <p class="control-note">Look around · release to center</p>
+          </div>
+        </div>
+      </fieldset>
+      <footer>
+        <label class="switch-row"><input type="checkbox" id="mic" disabled><span class="switch"></span><span>Microphone lip-sync<small id="mic-detail">Pi microphone · waiting for connection</small></span></label>
+        <label class="switch-row"><input type="checkbox" id="idle" checked disabled><span class="switch"></span><span>Idle animations<small>Breathing · blinking · tail</small></span></label>
+      </footer>
+    </section>
+    <section id="connection-panel" hidden class="sheet">
+      <div class="section-heading"><div><span class="eyebrow">DIRECT BLUETOOTH</span><h2>Connect to Luna</h2></div><button class="secondary back">Back</button></div>
+      <p>Start the Pi Bluetooth service, then search. For first-time pairing, open the pairing window on the Pi and approve the device.</p>
+      <button id="scan">Search nearby</button><div id="devices"></div>
+      <p class="small">No internet or venue Wi-Fi required. Leaving this app or locking the phone disconnects live control.</p>
+    </section>
+    <section id="settings-panel" hidden class="sheet">
+      <div class="section-heading"><div><span class="eyebrow">LUNA CONTROL</span><h2>Settings</h2></div><button class="secondary back">Back</button></div>
+      <button id="calibration-link" class="setting-card"><span>Joint calibration<small>Guided setup · one joint at a time</small></span><span>→</span></button>
+      <details id="legacy"><summary>Legacy features</summary>
+        <div class="legacy-box"><h3>Luna’s Story</h3><p>Legacy jaw animation only. Start the separate audio/video presentation at the same time. Starting again restarts from the beginning.</p>
+          <button id="story-start" disabled>Start story jaw track</button><button id="story-stop" class="secondary" disabled>Stop story</button><p id="story-state" class="small">Stopped</p>
+        </div>
+      </details>
+      <p class="small">PS4 backup: press the PS button to take control. Tap Take control here to switch back. Calibration is performed in this app.</p>
+      <p class="small">Disconnect behavior: neutral + idle animations; microphone forced on when available. Reconnection never takes control automatically.</p>
+    </section>
+    <section id="calibration-panel" hidden class="sheet">
+      <div class="section-heading"><div><span class="eyebrow">SUPERVISED SETUP</span><h2>Joint calibration</h2></div><button id="cal-exit" class="secondary">Exit calibration</button></div>
+      <p class="warning">Support Luna’s moving parts. Only the selected joint is powered during adjustment; other joints are released. Selecting a step can move that joint to its stored position. Stop and disconnect servo power if anything binds. Saving the final step enables normal idle motion.</p>
+      <label for="step-select">Choose a joint / position</label><select id="step-select"></select>
+      <div class="cal-card"><span id="step-count" class="eyebrow"></span><h3 id="step-label"></h3><p id="step-instruction"></p><output id="cal-angle">—</output>
+        <button id="cal-begin" disabled>Activate this joint</button>
+        <div class="nudge-row"><button id="minus" class="secondary" disabled>− 0.5°</button><button id="plus" class="secondary" disabled>+ 0.5°</button></div>
+        <button id="cal-save" disabled>Save position &amp; continue</button><button id="cal-cancel" class="secondary" disabled>Discard this adjustment</button>
+      </div>
+      <p id="cal-progress" class="small">Connect and take control to calibrate.</p>
+    </section>
+  </main>
+</body>
+</html>
