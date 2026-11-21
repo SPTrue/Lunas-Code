@@ -1,0 +1,7 @@
+# On Raspberry Pi OS Trixie, use a --system-site-packages venv; see docs/PHONE_SETUP.md.
+# NumPy, SciPy, PyAudio, PyGObject and dbus-python come from apt, not the old pins.
+bluezero==0.9.1
+adafruit-blinka==10.2.0
+adafruit-circuitpython-motor>=3.4.13,<4
+adafruit-circuitpython-pca9685>=3.4.15,<4
+pyPS4Controller==1.2.5

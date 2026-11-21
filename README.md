@@ -1,6 +1,14 @@
 # Luna the Animatronic Alebrije
 Animatronic Ambassador for the Living Text Project at Monterey County Office of Education
 
+## Android phone control (new, supervised commissioning required)
+
+An Android control panel and direct-Bluetooth Pi service are available alongside
+the original PS4 controller program. Start with
+[the phone setup guide](docs/PHONE_SETUP.md) for installation, pairing,
+calibration, disconnect behavior, and the limitations of this first version.
+The original program below remains unchanged; never run both programs at once.
+
 ## Hardware and Requirements
 - Raspberry Pi 4, running Raspbian OS
     - python3 should come pre-installed on Raspbian
